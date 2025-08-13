@@ -52,7 +52,7 @@ def generate_qr_code():
         box_size=10,
         border=4,
     )
-    qr.add_data("http://your-application-url.com")
+    qr.add_data("https://mock-interview-talent.streamlit.app/")
     qr.make(fit=True)
     img = qr.make_image(fill_color="black", back_color="white")
     img.save(QR_CODE_FILE)
@@ -88,15 +88,15 @@ def initialize_files():
         with open(USERS_FILE, "w") as f:
             json.dump({
                 "admin": {
-                    "password": "candidate123",
+                    "password": "Mockk2@2025",
                     "role": "candidate"
                 },
                 "facilitator": {
-                    "password": "facilitator123",
+                    "password": "Faci@2025#!",
                     "role": "facilitator"
                 },
                 "candidate": {
-                    "password": "candidate123",
+                    "password": "Mock2@2025",
                     "role": "candidate"
                 }
             }, f)
@@ -219,6 +219,16 @@ def set_custom_styles():
         border-left: 4px solid var(--primary-color);
     }
     
+    /* Delete button styling */
+    .delete-btn {
+        background-color: var(--error-color) !important;
+        margin-top: 1rem;
+    }
+    
+    .delete-btn:hover {
+        background-color: #c0392b !important;
+    }
+    
     /* Responsive adjustments */
     @media (max-width: 768px) {
         .login-container {
@@ -317,7 +327,7 @@ def authenticate():
                 except Exception as e:
                     st.markdown(f'<p class="error-message">Login error: {str(e)}</p>', unsafe_allow_html=True)
         
-        # Forgot password link
+        # Forgot password 
         st.markdown('<div style="text-align: center; margin-top: 1rem;">', unsafe_allow_html=True)
         st.markdown('<a href="#" style="color: var(--secondary-color); text-decoration: none;">Forgot password?</a>', unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
@@ -468,7 +478,7 @@ def display_cv(cv_path):
         st.error(f"Error displaying CV: {str(e)}")
 
 def facilitator_dashboard():
-    """Enhanced facilitator dashboard"""
+    """Enhanced facilitator dashboard with delete functionality"""
     st.title("Facilitator Dashboard")
     show_qr_code()
     
@@ -556,18 +566,34 @@ def facilitator_dashboard():
                             key=f"notes_{row['timestamp']}"
                         )
                         
-                        if st.form_submit_button("Update"):
-                            try:
-                                df.loc[df['timestamp'] == row['timestamp'], 'status'] = new_status
-                                df.loc[df['timestamp'] == row['timestamp'], 'notes'] = notes
-                                df.to_csv(CANDIDATES_FILE, index=False)
-                                st.success("Application updated successfully!")
-                                st.rerun()
-                            except Exception as e:
-                                st.error(f"Error updating application: {str(e)}")
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            if st.form_submit_button("Update"):
+                                try:
+                                    df.loc[df['timestamp'] == row['timestamp'], 'status'] = new_status
+                                    df.loc[df['timestamp'] == row['timestamp'], 'notes'] = notes
+                                    df.to_csv(CANDIDATES_FILE, index=False)
+                                    st.success("Application updated successfully!")
+                                    st.rerun()
+                                except Exception as e:
+                                    st.error(f"Error updating application: {str(e)}")
+                        with col2:
+                            if st.form_submit_button("Delete", help="Delete this application permanently"):
+                                try:
+                                    # Remove the CV file if it exists
+                                    if os.path.exists(cv_path):
+                                        os.remove(cv_path)
+                                    
+                                    # Remove the application from the dataframe
+                                    df = df[df['timestamp'] != row['timestamp']]
+                                    df.to_csv(CANDIDATES_FILE, index=False)
+                                    st.success("Application deleted successfully!")
+                                    st.rerun()
+                                except Exception as e:
+                                    st.error(f"Error deleting application: {str(e)}")
 
 def admin_dashboard():
-    """Enhanced admin dashboard"""
+    """Enhanced admin dashboard with delete functionality"""
     st.title("Admin Dashboard")
     show_qr_code()
     
@@ -653,6 +679,24 @@ def admin_dashboard():
                         
                         st.write(f"**Status:** {row['status']}")
                         st.write(f"**Notes:** {row['notes']}")
+                        
+                        # Delete button for admin
+                        if st.button("Delete Application", 
+                                   key=f"delete_{row['timestamp']}",
+                                   help="Permanently delete this application",
+                                   type="primary"):
+                            try:
+                                # Remove the CV file if it exists
+                                if os.path.exists(cv_path):
+                                    os.remove(cv_path)
+                                
+                                # Remove the application from the dataframe
+                                df = df[df['timestamp'] != row['timestamp']]
+                                df.to_csv(CANDIDATES_FILE, index=False)
+                                st.success("Application deleted successfully!")
+                                st.rerun()
+                            except Exception as e:
+                                st.error(f"Error deleting application: {str(e)}")
 
 def main():
     """Main application function"""
