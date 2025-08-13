@@ -1,0 +1,1 @@
+{"admin": {"password": "admin123", "role": "admin"}, "facilitator": {"password": "facilitator123", "role": "facilitator"}, "candidate": {"password": "candidate123", "role": "candidate"}}
