@@ -105,56 +105,70 @@ def initialize_files():
         generate_qr_code()
 
 def set_custom_styles():
-    """Set custom CSS styles for the entire application"""
+    """Set custom CSS styles for the entire application including dark mode support."""
     st.markdown("""
     <style>
     :root {
         --primary-color: #2c3e50;
         --secondary-color: #34495e;
         --accent-color: #3498db;
-        --text-color: #333;
+        --text-color: #222;
         --light-gray: #ecf0f1;
         --error-color: #e74c3c;
         --success-color: #2ecc71;
+        --input-bg: #fff;
+        --input-text: #222;
+        --form-bg: #fff;
     }
-    
-    /* Main app styling */
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --primary-color: #e0e0e0;
+            --secondary-color: #fff;
+            --accent-color: #7ed6df;
+            --text-color: #fff;
+            --light-gray: #333;
+            --error-color: #ff7675;
+            --success-color: #55efc4;
+            --input-bg: #222;
+            --input-text: #fff;
+            --form-bg: #16181d;
+        }
+        body, .stApp { background-color: #16181d !important; }
+    }
+
     .stApp {
-        background-color: #f5f7fa;
+        background-color: var(--light-gray);
+        color: var(--text-color);
     }
-    
-    /* Login page specific styling */
-    .login-container {
-        max-width: 500px;
-        margin: 2rem auto;
-        padding: 2.5rem;
-        border-radius: 10px;
-        background: #FFFFFF;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        border: 1px solid #E0E0E0;
-    }
-    
     .login-header {
         text-align: center;
         margin-bottom: 1.5rem;
-        color: var(--primary-color);
+        color: var(--primary-color) !important;
         font-size: 2rem;
         font-weight: 600;
+        text-shadow: 0 2px 8px #0001;
     }
-    
-    /* Form elements */
+    .form-container, .login-container {
+        background: var(--form-bg) !important;
+        color: var(--text-color) !important;
+    }
+    /* Ensure input fields and labels have visible text and backgrounds */
     .stTextInput>div>div>input, 
     .stTextArea>div>div>textarea,
     .stSelectbox>div>div>select {
-        border: 1px solid #E0E0E0 !important;
+        border: 1px solid #888 !important;
         border-radius: 6px !important;
         padding: 10px !important;
+        background: var(--input-bg) !important;
+        color: var(--input-text) !important;
     }
-    
+    .stTextInput label, .stTextArea label, .stSelectbox label {
+        color: var(--text-color) !important;
+    }
+    /* Button styles */
     .stButton>button {
-        width: 100%;
         background-color: var(--primary-color) !important;
-        color: white !important;
+        color: var(--input-bg) !important;
         font-weight: 500 !important;
         border: none !important;
         padding: 12px !important;
@@ -162,11 +176,15 @@ def set_custom_styles():
         font-size: 1rem !important;
         transition: background-color 0.3s;
     }
-    
     .stButton>button:hover {
         background-color: var(--secondary-color) !important;
+        color: var(--input-bg) !important;
     }
-    
+    /* Headers, department cards, etc. */
+    .section-header, .department-card, .applicant-card {
+        color: var(--primary-color) !important;
+        background: var(--form-bg) !important;
+    }
     /* Error messages */
     .error-message {
         color: var(--error-color) !important;
@@ -174,25 +192,22 @@ def set_custom_styles():
         text-align: center !important;
         margin-top: 1rem !important;
     }
-    
     /* Logo container */
     .logo-container {
         display: flex;
         justify-content: center;
         margin-bottom: 1.5rem;
     }
-    
     /* Application form styling */
     .form-container {
         max-width: 800px;
         margin: 0 auto;
         padding: 2rem;
         border-radius: 10px;
-        background: #FFFFFF;
+        background: var(--form-bg) !important;
         box-shadow: 0 4px 20px rgba(0,0,0,0.1);
         border: 1px solid #E0E0E0;
     }
-    
     .section-header {
         color: var(--primary-color);
         border-bottom: 1px solid #E0E0E0;
@@ -200,7 +215,6 @@ def set_custom_styles():
         margin-bottom: 1.5rem;
         font-weight: 600;
     }
-    
     .department-card {
         padding: 1rem;
         border-radius: 8px;
@@ -208,43 +222,36 @@ def set_custom_styles():
         background: #F8F9FA;
         border-left: 4px solid var(--primary-color);
     }
-    
     /* Dashboard cards */
     .applicant-card {
         padding: 1rem;
         margin-bottom: 1rem;
         border-radius: 8px;
-        background: white;
+        background: var(--form-bg) !important;
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         border-left: 4px solid var(--primary-color);
     }
-    
     /* Delete button styling */
     .delete-btn {
         background-color: var(--error-color) !important;
         margin-top: 1rem;
     }
-    
     .delete-btn:hover {
         background-color: #c0392b !important;
     }
-    
     /* Responsive adjustments */
     @media (max-width: 768px) {
         .login-container {
             padding: 1.5rem;
             margin: 1rem;
         }
-        
         .form-container {
             padding: 1rem;
         }
-        
         .section-header {
             font-size: 1.2rem;
         }
     }
-    
     /* Password toggle button */
     .password-toggle-container {
         position: relative;
